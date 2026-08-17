@@ -1,19 +1,17 @@
 "use client";
 
+import { Suspense, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
 import Link from "next/link";
 
-export default function LoginPage() {
+function LoginPageInner() {
   const router = useRouter();
   const params = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const hasGoogle = process.env.NEXT_PUBLIC_GOOGLE_ENABLED === "true";
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -79,5 +77,13 @@ export default function LoginPage() {
         </Link>
       </p>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="max-w-sm mx-auto px-4 py-16 text-center text-cream/50">Loading…</div>}>
+      <LoginPageInner />
+    </Suspense>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -11,7 +11,7 @@ type Result = {
   artists: { id: string; name: string; photo: string | null; role: string; verified: boolean }[];
 };
 
-export default function SearchPage() {
+function SearchPageInner() {
   const params = useSearchParams();
   const router = useRouter();
   const initialQ = params.get("q") ?? "";
@@ -94,5 +94,13 @@ export default function SearchPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div className="max-w-6xl mx-auto px-4 py-10 text-cream/50">Loading…</div>}>
+      <SearchPageInner />
+    </Suspense>
   );
 }
