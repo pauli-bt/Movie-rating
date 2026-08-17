@@ -5,7 +5,7 @@ import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
-const providers = [
+const providers : any[] = [
   CredentialsProvider({
     name: "Email & password",
     credentials: {
