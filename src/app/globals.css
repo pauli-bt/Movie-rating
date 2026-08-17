@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-coffee-900 text-cream bg-grain;
+    background-size: 18px 18px;
+  }
+  ::selection {
+    @apply bg-gold text-coffee-950;
+  }
+  :focus-visible {
+    outline: 2px solid #E8A33D;
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .stamp-badge {
+    @apply relative flex items-center justify-center rounded-full border-2 border-gold text-gold font-display;
+  }
+  .card {
+    @apply bg-coffee-800 border border-coffee-600/60 rounded-lg overflow-hidden transition-transform duration-200;
+  }
+  .card:hover {
+    @apply -translate-y-1 border-gold/50;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-md bg-gold text-coffee-950 font-semibold px-4 py-2 hover:bg-gold-light transition-colors;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-md border border-cream/30 text-cream px-4 py-2 hover:border-gold hover:text-gold transition-colors;
+  }
+  .input {
+    @apply w-full rounded-md bg-coffee-950 border border-coffee-600 px-3 py-2 text-cream placeholder:text-cream/40 focus:border-gold outline-none;
+  }
+}

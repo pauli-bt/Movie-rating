@@ -1,0 +1,174 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  visitor
+  member
+  verified
+  admin
+}
+
+enum ArtistRole {
+  actor
+  director
+  studio
+}
+
+enum CastRole {
+  actor
+  director
+  producer
+}
+
+model User {
+  id            String   @id @default(cuid())
+  name          String?
+  username      String   @unique
+  email         String   @unique
+  emailVerified DateTime?
+  passwordHash  String?
+  image         String?
+  role          Role     @default(visitor)
+  createdAt     DateTime @default(now())
+
+  accounts       Account[]
+  sessions       Session[]
+  reviews        Review[]
+  ratings        Rating[]
+  claimedArtists Artist[]  @relation("ClaimedArtist")
+}
+
+model Movie {
+  id          String    @id @default(cuid())
+  title       String
+  poster      String?
+  description String?
+  genre       String?
+  duration    Int?
+  language    String?
+  country     String?
+  releaseDate DateTime?
+  createdAt   DateTime  @default(now())
+
+  cast    MovieCast[]
+  reviews Review[]
+  ratings Rating[]
+
+  @@index([title])
+}
+
+model Artist {
+  id              String     @id @default(cuid())
+  name            String
+  photo           String?
+  bio             String?
+  role            ArtistRole
+  verified        Boolean    @default(false)
+  claimedByUserId String?
+  socialLinks     String?
+
+  claimedBy     User?          @relation("ClaimedArtist", fields: [claimedByUserId], references: [id])
+  movies        MovieCast[]
+  claimRequests ClaimRequest[]
+
+  @@index([name])
+}
+
+model MovieCast {
+  id            String   @id @default(cuid())
+  movieId       String
+  artistId      String
+  characterName String?
+  role          CastRole
+
+  movie  Movie  @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  artist Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+
+  @@index([movieId])
+  @@index([artistId])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  movieId   String
+  text      String
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@index([movieId])
+}
+
+model Rating {
+  id      String @id @default(cuid())
+  userId  String
+  movieId String
+  overall Int
+  story   Int
+  acting  Int
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, movieId])
+  @@index([movieId])
+}
+
+model ClaimRequest {
+  id        String   @id @default(cuid())
+  artistId  String
+  userName  String
+  userEmail String
+  userPhone String?
+  message   String?
+  status    String   @default("pending")
+  createdAt DateTime @default(now())
+
+  artist Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+}
+
+// --- NextAuth required models ---
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
