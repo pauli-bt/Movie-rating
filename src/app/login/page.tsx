@@ -34,10 +34,7 @@ function LoginPageInner() {
     <div className="max-w-sm mx-auto px-4 py-16">
       <h1 className="font-display text-3xl mb-8 text-center">Sign in</h1>
 
-      <button
-        onClick={() => signIn("google")}
-        className="btn-secondary w-full mb-6"
-      >
+      <button onClick={() => signIn("google")} className="btn-secondary w-full mb-6">
         Continue with Google
       </button>
 
